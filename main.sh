@@ -11,9 +11,11 @@ oc create secret generic multiclusterhub-operator-pull-secret \
 
 # Create secret for thanos.yaml
 
-S3_ENDPOINT=`oc get routes -n openshift-storage s3 -o jsonpath='{.spec.host}'`
-S3_ACCESS_KEY=`oc get secret noobaa-admin -n openshift-storage -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 -d`
-S3_SECRET_KEY=`oc get secret noobaa-admin -n openshift-storage -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 -d`
+S3_BUCKET_NAME=`oc get cm acm-observability-obc -n open-cluster-management-observability -o jsonpath='{.data.BUCKET_NAME}'`
+S3_ENDPOINT=`oc get cm acm-observability-obc -n open-cluster-management-observability -o jsonpath='{.data.BUCKET_HOST}'`
+S3_ENDPOINT_PORT=`oc get cm acm-observability-obc -n open-cluster-management-observability -o jsonpath='{.data.BUCKET_PORT}'`
+S3_ACCESS_KEY=`oc get secret acm-observability-obc -n open-cluster-management-observability -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 -d`
+S3_SECRET_KEY=`oc get secret acm-observability-obc -n open-cluster-management-observability -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 -d`
 
 cat << EOF | oc apply -f -
 apiVersion: v1
@@ -26,8 +28,8 @@ stringData:
   thanos.yaml: |
     type: s3
     config:
-      bucket: acm.observability
-      endpoint: $S3_ENDPOINT
+      bucket: $S3_BUCKET_NAME
+      endpoint: $S3_ENDPOINT:$S3_ENDPOINT_PORT
       insecure: true
       access_key: $S3_ACCESS_KEY
       secret_key: $S3_SECRET_KEY
