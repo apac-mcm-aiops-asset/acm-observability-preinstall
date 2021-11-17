@@ -29,7 +29,7 @@ stringData:
     type: s3
     config:
       bucket: $S3_BUCKET_NAME
-      endpoint: $S3_ENDPOINT:$S3_ENDPOINT_PORT
+      endpoint: $S3_ENDPOINT
       insecure: true
       access_key: $S3_ACCESS_KEY
       secret_key: $S3_SECRET_KEY
